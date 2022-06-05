@@ -16,6 +16,17 @@ func Hello(name string) (string, error) {
 	message := fmt.Sprintf(randomFormat(), name)
 	return message, nil
 }
+func Hellos(name []string) (map[string]string, error) {
+	willReturn := make(map[string]string, len(name))
+	for _, str := range name {
+		message, err := Hello(str)
+		if err != nil {
+			return nil, err
+		}
+		willReturn[str] = message
+	}
+	return willReturn, nil // 此处最好能返回a or b 而不是a and b
+}
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
