@@ -11,6 +11,10 @@ import (
 func main() {
 	fmt.Printf("Hello,%s!\n", "world")
 	fmt.Println(quote.GoV3()) // update it to v3 is a stupid idea
-	world := greetings.Hello("world")
-	fmt.Printf(world)
+	world, err := greetings.Hello("world")
+	if err == nil {
+		fmt.Println(world)
+	} else {
+		fmt.Println(err.Error())
+	}
 }
