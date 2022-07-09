@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"gogogo/greetings"
+	"gogogo/pkg/greetings"
 	"log"
 	"rsc.io/quote/v3"
 )
