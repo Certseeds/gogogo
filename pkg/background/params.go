@@ -1,8 +1,10 @@
 package background
 
 import (
+	"bytes"
 	"embed"
 	_ "embed"
+	"encoding/gob"
 	"encoding/json"
 	_ "encoding/json"
 	_ "fmt"
@@ -39,8 +41,20 @@ func init() {
 	json.Unmarshal(raw, &config)
 }
 
+// GetConfig
+// return a copy of Config, change it is useless
 func GetConfig() Config {
-	return config
+	buf := bytes.Buffer{}
+	var err error
+	if err = gob.NewEncoder(&buf).Encode(config); err != nil {
+		return config
+	}
+	dist := Config{}
+	err = gob.NewDecoder(&buf).Decode(&dist)
+	if err != nil {
+		return config
+	}
+	return dist
 }
 
 func GetPureConfig() (string, error) {

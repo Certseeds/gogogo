@@ -6,7 +6,7 @@ on: [ push ]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   test:
-    name: run maven test
+    name: run go build and test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
