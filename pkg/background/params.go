@@ -3,31 +3,32 @@ package background
 import (
 	"bytes"
 	"embed"
-	_ "embed"
 	"encoding/gob"
 	"encoding/json"
-	_ "encoding/json"
-	_ "fmt"
-	"log"
+	"gogogo/pkg/background/internal"
 )
 
 //go:embed config.json
 var configFile embed.FS
 
-type Database struct {
+type DatabaseRecord struct {
 	Address  string `json:"address"`
 	Port     int    `json:"port"`
 	User     string `json:"user"`
 	Password int    `json:"password"`
 }
-type Github struct {
+type GithubRecord struct {
 	FollowingDepth int    `json:"followingDepth"`
 	FollowerDepth  int    `json:"followerDepth"`
 	TokenEnvName   string `json:"tokenEnvName"`
 }
+type ScheduleRecord struct {
+	Cron string `json:"cron"`
+}
 type Config struct {
-	Database Database `json:"database"`
-	Github   Github   `json:"github"`
+	Database DatabaseRecord `json:"database"`
+	Github   GithubRecord   `json:"github"`
+	Schedule ScheduleRecord `json:"schedule"`
 }
 
 var config Config
@@ -35,7 +36,7 @@ var config Config
 func init() {
 	raw, err := configFile.ReadFile("config.json")
 	if err != nil {
-		log.Fatalln("read config fail")
+		internal.Logger.Fatal("read config fail")
 		return
 	}
 	json.Unmarshal(raw, &config)
@@ -60,7 +61,7 @@ func GetConfig() Config {
 func GetPureConfig() (string, error) {
 	raw, err := configFile.ReadFile("config.json")
 	if err != nil {
-		log.Fatalln("read config fail")
+		internal.Logger.Fatal("read config fail")
 		return "", err
 	}
 	return string(raw), nil

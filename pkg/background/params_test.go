@@ -17,7 +17,7 @@ func TestConfigImmutable(t *testing.T) {
 	assert.NotEmpty(t, GetConfig(), "embed to binary")
 	assert.NotEqual(t, len(GetConfig().Github.TokenEnvName), 0)
 	config := GetConfig()
-	config.Github = Github{
+	config.Github = GithubRecord{
 		0,
 		0,
 		"",

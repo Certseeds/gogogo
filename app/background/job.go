@@ -2,19 +2,12 @@ package main
 
 import (
 	"gogogo/pkg/background"
-	"log"
 )
-import "fmt"
 
-//main
+// main
 // 预期:
 //  + 通过读取配置文件来获取关键配置
 //  + 持续运行,后台定期调用某个线程,从某个地方获取资源,进行某些演算,最后存进某个地方
 func main() {
-	pureConfig, err := background.GetPureConfig()
-	if err != nil {
-		log.Fatalln("read config fail")
-	}
-	fmt.Println(pureConfig)
-	fmt.Println(background.GetConfig())
+	background.Main()
 }
