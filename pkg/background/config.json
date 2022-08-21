@@ -6,11 +6,12 @@
     "password": 123456
   },
   "github": {
+    "maintainer": "Certseeds",
     "followingDepth": 2,
     "followerDepth": 2,
     "tokenEnvName": "GITHUB_TOKEN"
   },
   "schedule": {
-    "cron": "@every 3s"
+    "cron": "@every 10s"
   }
 }

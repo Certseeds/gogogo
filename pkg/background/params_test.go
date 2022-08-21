@@ -19,6 +19,7 @@ func TestConfigImmutable(t *testing.T) {
 	assert.NotEqual(t, len(GetConfig().Github.TokenEnvName), 0)
 	config := GetConfig()
 	config.Github = GithubRecord{
+		"",
 		0,
 		0,
 		"",

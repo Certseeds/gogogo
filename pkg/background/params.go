@@ -19,6 +19,7 @@ type DatabaseRecord struct {
 	Password int    `json:"password"`
 }
 type GithubRecord struct {
+	Maintainer     string `json:"maintainer"`
 	FollowingDepth int    `json:"followingDepth"`
 	FollowerDepth  int    `json:"followerDepth"`
 	TokenEnvName   string `json:"tokenEnvName"`
