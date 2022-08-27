@@ -12,9 +12,10 @@ COPY . .
 
 RUN cd /app/app/background \
     && CGO_ENABLED=0  \
-    GOOS=linux \
-    GOARCH=amd64 \
-    go build -o job.exe
+        GOOS=linux \
+        GOARCH=amd64 \
+        go build \
+        -o job.exe
 
 FROM alpine AS PRODUCT
 
@@ -24,6 +25,6 @@ COPY --from=BUILD /app/app/background/job.exe .
 
 CMD ["/app/job.exe"]
 
-FROM scratch AS EXPORT
-
-COPY --from=BUILD /app/app/background/job.exe /
+#FROM scratch AS EXPORT
+#
+#COPY --from=BUILD /app/app/background/job.exe /

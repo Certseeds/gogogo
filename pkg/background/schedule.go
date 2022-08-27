@@ -5,7 +5,6 @@ package background
 import (
 	"gogogo/pkg/background/internal"
 	"gogogo/pkg/background/request"
-	"math"
 	"os"
 	"time"
 )
@@ -25,8 +24,8 @@ func schedule() {
 		return
 	}
 	internal.Logger.Info(MaintainerInfo)
-	pages := int64(math.Ceil(float64(MaintainerInfo.Followers) / 30))
-	for i := int64(1); i <= pages; i++ {
-		internal.Logger.Info(request.Followers(token, MaintainerInfo.Login, i))
+	followers, err := request.GetUserFollower(MaintainerInfo, token)
+	if err != nil {
+		internal.Logger.Info(followers)
 	}
 }

@@ -1,0 +1,22 @@
+version: '2.6'
+services:
+  app:
+    build:
+      context: ./../../
+      dockerfile: './deployments/background/build.Dockerfile'
+    container_name: 'background_application'
+    environment:
+      - 'GITHUB_TOKEN'
+    restart: always
+    depends_on:
+      - mysql
+  mysql:
+    image: 'mysql:8'
+    ports:
+      - '3306:3306'
+    container_name: 'background_mysql'
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - './schema.sql:/docker-entrypoint-initdb.d/1.sql'
