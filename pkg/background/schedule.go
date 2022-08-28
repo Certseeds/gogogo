@@ -19,13 +19,5 @@ func schedule() {
 	token := os.Getenv(tokenEnv)
 	maintainer := GetConfig().Github.Maintainer
 	internal.Logger.Info(request.Zen(token))
-	MaintainerInfo, err := request.Users(token, maintainer)
-	if err != nil {
-		return
-	}
-	internal.Logger.Info(MaintainerInfo)
-	followers, err := request.GetUserFollower(MaintainerInfo, token)
-	if err != nil {
-		internal.Logger.Info(followers)
-	}
+	SyncGithubUser(maintainer, token, GetConfig().Github.FollowerDepth)
 }

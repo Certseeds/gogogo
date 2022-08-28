@@ -1,17 +1,19 @@
 {
   "database": {
-    "address": "127.0.0.1",
+    "address": "192.168.50.120",
     "port": 3306,
     "user": "root",
-    "password": 123456
+    "password": 123456,
+    "dbname": "background"
   },
   "github": {
     "maintainer": "Certseeds",
-    "followingDepth": 2,
-    "followerDepth": 2,
-    "tokenEnvName": "GITHUB_TOKEN"
+    "followingDepth": 1,
+    "followerDepth": 1,
+    "tokenEnvName": "GITHUB_TOKEN",
+    "buggerMax": 450
   },
   "schedule": {
-    "cron": "@every 10s"
+    "cron": "@every 5m"
   }
 }

@@ -23,6 +23,7 @@ func TestConfigImmutable(t *testing.T) {
 		0,
 		0,
 		"",
+		450,
 	}
 	assert.NotEqual(t, len(GetConfig().Github.TokenEnvName), 0)
 }

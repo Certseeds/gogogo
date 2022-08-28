@@ -6,6 +6,7 @@ import (
 	"embed"
 	"encoding/gob"
 	"encoding/json"
+	"fmt"
 	"gogogo/pkg/background/internal"
 )
 
@@ -17,12 +18,14 @@ type DatabaseRecord struct {
 	Port     int    `json:"port"`
 	User     string `json:"user"`
 	Password int    `json:"password"`
+	Dbname   string `json:"dbname"`
 }
 type GithubRecord struct {
 	Maintainer     string `json:"maintainer"`
 	FollowingDepth int    `json:"followingDepth"`
 	FollowerDepth  int    `json:"followerDepth"`
 	TokenEnvName   string `json:"tokenEnvName"`
+	BuggerMax      int64  `json:"buggerMax"`
 }
 type ScheduleRecord struct {
 	Cron string `json:"cron"`
@@ -59,7 +62,16 @@ func GetConfig() Config {
 	}
 	return dist
 }
-
+func GetDataBaseConnection() string {
+	dbConf := GetConfig().Database
+	return fmt.Sprintf("%s:%d@(%s:%d)/%s",
+		dbConf.User,
+		dbConf.Password,
+		dbConf.Address,
+		dbConf.Port,
+		dbConf.Dbname,
+	)
+}
 func GetPureConfig() (string, error) {
 	raw, err := configFile.ReadFile("config.json")
 	if err != nil {

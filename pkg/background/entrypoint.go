@@ -13,6 +13,7 @@ func Main() {
 	if err != nil {
 		internal.Logger.Fatal("real config fail")
 	}
+	Schedule()()
 	configRecord := GetConfig()
 	work := cron.New(cron.WithSeconds())
 	_, err = work.AddFunc(configRecord.Schedule.Cron, Schedule())

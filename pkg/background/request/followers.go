@@ -3,7 +3,6 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	"gogogo/pkg/background/internal"
 	"math"
 )
 
@@ -21,11 +20,13 @@ func Followers(token string, username string, page int64) (*[]GitHubUser, error)
 		return nil, err
 	}
 	var userInfo []GitHubUser
-	json.Unmarshal(resp, &userInfo)
+	// the follower will be the last level of rec, so just get for pages will make get less cost
+	_ = json.Unmarshal(resp, &userInfo)
 	return &userInfo, nil
 }
 func GetUserFollower(user *GitHubUser, token string) (*[]GitHubUser, error) {
-	pages := int64(math.Ceil(float64(user.Followers) / 30))
+	pages_ := int64(math.Ceil(float64(user.Followers) / 30))
+	pages := int64(math.Min(float64(pages_), 5))
 	doneChallen := make(chan bool, pages)
 	userChan := make(chan *[]GitHubUser, pages)
 	for i := int64(1); i <= pages; i++ {
@@ -49,7 +50,7 @@ func GetUserFollower(user *GitHubUser, token string) (*[]GitHubUser, error) {
 	for _, userList := range userLists {
 		for _, user := range *userList {
 			willReturn[count] = user
-			internal.Logger.Info(user)
+			// internal.Logger.Info(user)
 			count += 1
 		}
 	}

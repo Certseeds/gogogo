@@ -7,6 +7,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/zap v1.21.0
 	rsc.io/quote/v3 v3.1.0
+	github.com/go-sql-driver/mysql v1.6.0
 )
 
 require (

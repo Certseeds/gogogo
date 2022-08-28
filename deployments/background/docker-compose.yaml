@@ -5,18 +5,25 @@ services:
       context: ./../../
       dockerfile: './deployments/background/build.Dockerfile'
     container_name: 'background_application'
+    env_file:
+      - env
     environment:
-      - 'GITHUB_TOKEN'
-    restart: always
+      - GITHUB_TOKEN
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
   mysql:
     image: 'mysql:8'
     ports:
       - '3306:3306'
     container_name: 'background_mysql'
     restart: on-failure
-    environment:
-      - MYSQL_ROOT_PASSWORD=123456
+    network_mode: "host"
+    env_file:
+      - env
     volumes:
       - './schema.sql:/docker-entrypoint-initdb.d/1.sql'
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
