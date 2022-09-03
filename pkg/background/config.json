@@ -14,6 +14,6 @@
     "buggerMax": 450
   },
   "schedule": {
-    "cron": "@every 5m"
+    "cron": "@every 10m"
   }
 }
