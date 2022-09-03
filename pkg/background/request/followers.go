@@ -14,7 +14,7 @@ type FollowUser struct {
 	FollowingUrl string `json:"following_url"`
 }
 
-func Followers(token string, username string, page int64) (*[]GitHubUser, error) {
+func followers(token string, username string, page int64) (*[]GitHubUser, error) {
 	resp, err := GetRequester(fmt.Sprintf("https://api.github.com/users/%s/followers?per_page=30&page=%d", username, page), token)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func GetUserFollower(user *GitHubUser, token string) (*[]GitHubUser, error) {
 	userChan := make(chan *[]GitHubUser, pages)
 	for i := int64(1); i <= pages; i++ {
 		go func(token string, userLogin string, pageId int64, done chan bool, userChan chan *[]GitHubUser) {
-			followers, err := Followers(token, userLogin, pageId)
+			followers, err := followers(token, userLogin, pageId)
 			if err != nil {
 				done <- false
 				userChan <- nil

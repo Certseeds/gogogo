@@ -1,4 +1,4 @@
-FROM golang:1.18 AS BUILD
+FROM golang:1.18 AS build_prepare
 
 RUN go env -w  GOPROXY="https://goproxy.io,direct"
 
@@ -9,6 +9,13 @@ COPY go.mod go.sum /app/
 RUN go mod download
 
 COPY . .
+
+FROM build_prepare AS TEST
+
+WORKDIR /app/pkg/background
+ENTRYPOINT ["go", "test","-v", "./..."]
+
+FROM build_prepare AS BUILD
 
 RUN cd /app/app/background \
     && CGO_ENABLED=0  \

@@ -17,6 +17,12 @@ jobs:
         with:
           go-version: '>=1.18.0' # The Go version to download (if necessary) and use.
       - run: go version
+
       - run: chmod +x ./Makefile
-      - run: make build
-      - run: make test
+
+      - run: pwd && make build
+        env:
+          SECRET_TOKEN: ${{ secrets.SECRET_TOKEN }}
+          MYSQL_ROOT_PASSWORD: 123456
+
+      - run: pwd && make test

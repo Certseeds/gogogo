@@ -1,10 +1,34 @@
 GO=go
 
-PKG_LIST:=$(shell ls ./pkg)
-APP_LIST:=$(shell ls ./app)
+DEP_LIST:=$(shell ls ./deployments)
 
-test:
-	@for var in $(PKG_LIST);do cd ./pkg/$$var && go test && cd ./../.. ; done
+.ONESHELL:
+build-dep:
+	@for var in $(DEP_LIST); do
+		cd ./deployments/$$var
+			make build
+		cd ./../..
+	done
 
-build:
-	@for var in $(APP_LIST);do cd ./app/$$var && go build . && cd ./../.. ; done
+.ONESHELL:
+build-pkg:
+	cd ./pkg/greetings
+		go build .
+	cd ./../..
+
+build: build-dep build-pkg
+
+.ONESHELL:
+test-dep:
+	@for var in $(DEP_LIST); do
+		cd ./deployments/$$var
+			make test
+		cd ./../..
+	done
+
+.ONESHELL:
+test-pkg:
+	cd ./pkg/greetings
+		go test -v ./...
+	cd ./../..
+test: test-dep test-pkg

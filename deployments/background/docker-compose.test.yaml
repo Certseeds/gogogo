@@ -1,25 +1,23 @@
 version: '3.9'
 services:
-  app:
+  app_test:
     build:
       context: ./../../
       dockerfile: './deployments/background/build.Dockerfile'
-      target: PRODUCT
-    container_name: 'background_application'
+      target: TEST
+    container_name: 'background_application_test'
     env_file:
       - secret.env
     depends_on:
-      mysql:
+      mysql_test:
         condition: service_healthy
     links:
-      - "mysql"
-  mysql:
+      - "mysql_test:mysql"
+  mysql_test:
     image: 'mysql:8'
     ports:
       - '3306:3306'
-    container_name: 'background_mysql'
-    restart: on-failure
-    network_mode: "host"
+    container_name: 'background_mysql_test'
     env_file:
       - secret.env
     volumes:

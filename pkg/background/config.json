@@ -1,6 +1,6 @@
 {
   "database": {
-    "address": "192.168.50.120",
+    "address": "mysql",
     "port": 3306,
     "user": "root",
     "password": 123456,
@@ -10,7 +10,7 @@
     "maintainer": "Certseeds",
     "followingDepth": 1,
     "followerDepth": 1,
-    "tokenEnvName": "GITHUB_TOKEN",
+    "tokenEnvName": "SECRET_TOKEN",
     "buggerMax": 450
   },
   "schedule": {
