@@ -19,7 +19,6 @@ services:
       - '3306:3306'
     container_name: 'background_mysql'
     restart: on-failure
-    network_mode: "host"
     env_file:
       - secret.env
     volumes:
