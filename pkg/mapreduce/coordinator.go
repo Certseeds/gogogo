@@ -1,6 +1,9 @@
 package mapreduce
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 import "net"
 import "os"
 import "net/rpc"
@@ -16,8 +19,15 @@ type Coordinator struct {
 // an example RPC handler.
 //
 // the RPC argument and reply types are defined in rpc.go.
-func (c *Coordinator) Example(args *ExampleArgs, reply *ExampleReply) error {
+func (c *Coordinator) MainExample(args ExampleArgs, reply *ExampleReply) error {
 	reply.Y = args.X + 1
+	ok := call("Coordinator.WorkerExample", args, reply)
+	if ok {
+		// reply.Y should be 100.
+		fmt.Printf("reply.Y %v \n", reply.Y)
+	} else {
+		fmt.Printf("call failed!\n")
+	}
 	return nil
 }
 

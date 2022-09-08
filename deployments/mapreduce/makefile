@@ -85,6 +85,14 @@ sequen-wc: sequential plugin_wc
 	&& sort mr-out-0 > ./../../assets/mapreduce/mr-correct-wc.txt \
 	&& rm ./mr-out-0
 
+comain-wc: coordinator plugin_wc
+	./comain.exe \
+		./../../assets/mapreduce/pg*.txt
+
+worker-wc: worker plugin_wc
+	./worker.exe \
+		./wc.so
+
 clean:
 	rm ./*.so
 
