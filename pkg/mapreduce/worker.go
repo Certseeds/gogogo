@@ -57,3 +57,11 @@ func CallExample() {
 		fmt.Printf("call failed!\n")
 	}
 }
+
+// an example RPC handler.
+//
+// the RPC argument and reply types are defined in rpc.go.
+func (c *Coordinator) WorkerExample(args ExampleArgs, reply *ExampleReply) error {
+	reply.Y = args.X + 1
+	return nil
+}
