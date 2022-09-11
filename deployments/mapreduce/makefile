@@ -3,6 +3,7 @@ RACE=-race
 GOC=go
 GOOS=GOOS=linux
 GO=${GOOS} ${GOC}
+TIMEOUT=timeout -k 2s 180s
 
 plugin_crash: ./../../pkg/mapreduce/crash/main/crash.go
 	${GOC} build \
@@ -62,39 +63,86 @@ sequential: ./../../app/mapreduce/sequence/mrsequential.go
 		-o sequential.exe \
 		./../../app/mapreduce/sequence/mrsequential.go
 
-coordinator:  ./../../app/mapreduce/mrcoordinator.go
+coordinator:  ./../../app/mapreduce/mrcoordinator.go ./../../pkg/mapreduce/coordinator.go ./../../pkg/mapreduce/rpc.go ./../../pkg/mapreduce/worker.go
 	${GOC} build \
 		${RACE} \
 		-o comain.exe \
 		./../../app/mapreduce/mrcoordinator.go
 
-worker:  ./../../app/mapreduce/mrworker.go
+worker:  ./../../app/mapreduce/mrworker.go  ./../../pkg/mapreduce/coordinator.go ./../../pkg/mapreduce/rpc.go ./../../pkg/mapreduce/worker.go
 	${GOC} build \
 		${RACE} \
 		-o worker.exe \
 		./../../app/mapreduce/mrworker.go
 
-.PHONY: plugin clean sequen-wc build
+.PHONY: plugin clean wc-sequen build
 
 plugin: plugin_crash plugin_early_exit plugin_indexer plugin_jobcount plugin_mtiming plugin_nocrash plugin_rtiming plugin_wc
 
-sequen-wc: sequential plugin_wc
+### wc begin
+wc-sequen: sequential plugin_wc
 	./sequential.exe \
 		./wc.so \
 		./../../assets/mapreduce/pg*.txt \
-	&& sort mr-out-0 > ./../../assets/mapreduce/mr-correct-wc.txt \
+	&& sort ./mr-out-0 > ./../../assets/mapreduce/mr-correct-wc.txt \
 	&& rm ./mr-out-0
 
-comain-wc: coordinator plugin_wc
-	./comain.exe \
-		./../../assets/mapreduce/pg*.txt
+wc-comain: coordinator plugin_wc
+	./comain.exe ./../../assets/mapreduce/pg*.txt
 
-worker-wc: worker plugin_wc
-	./worker.exe \
-		./wc.so
+wc-worker: worker plugin_wc
+	./worker.exe ./wc.so
+
+.ONESHELL:
+wc-compare:
+	cd ./../../assets/mapreduce/
+	if cmp mr-wc-all mr-correct-wc.txt ;then
+		echo '---' wc test: PASS
+	else
+		echo '---' wc output is not the same as mr-correct-wc.txt
+		echo '---' wc test: FAIL
+	fi
+	cd ./../../deployments/mapreduce
+
+.ONESHELL:
+wc-concurrent: wc-sequen worker coordinator plugin_wc
+	./wccon.sh
+### wc end
+
+### index begin
+
+index-sequen: sequential plugin_indexer
+	./sequential.exe \
+		./indexer.so \
+		./../../assets/mapreduce/pg*.txt \
+	&& sort ./mr-out-0 > ./../../assets/mapreduce/mr-correct-indexer.txt \
+	&& rm ./mr-out-0
+
+index-comain: coordinator plugin_indexer
+	./comain.exe ./../../assets/mapreduce/pg*.txt
+
+index-worker: worker plugin_indexer
+	./worker.exe ./indexer.so
+.ONESHELL:
+index-compare:
+	cd ./../../assets/mapreduce/
+	if cmp mr-indexer-all mr-correct-indexer.txt ;then
+		echo '---' indexer test: PASS
+	else
+		echo '---' indexer output is not the same as mr-correct-wc.txt
+		echo '---' indexer test: FAIL
+	fi
+	cd ./../../deployments/mapreduce
+
+.ONESHELL:
+index-concurrent: index-sequen worker coordinator plugin_indexer
+	./indexcon.sh
+### index end
 
 clean:
-	rm ./*.so
+	rm ./*.so mr-*-*
+	rm /var/tmp/824-mr-*
+
 
 build: plugin sequential coordinator worker
-test: build sequen-wc
+test: build wc-sequen index-sequen
