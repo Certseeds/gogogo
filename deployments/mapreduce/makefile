@@ -139,9 +139,49 @@ index-concurrent: index-sequen worker coordinator plugin_indexer
 	./indexcon.sh
 ### index end
 
+### mapper parallel begin
+parallel-map-comain: coordinator plugin_mtiming
+	./comain.exe ./../../assets/mapreduce/pg*.txt
+
+parallel-map-worker: worker plugin_mtiming
+	./worker.exe ./mtiming.so
+
+.ONESHELL:
+parallel-map-concurrent: coordinator worker plugin_mtiming
+	./parallel_map_concurrent.sh
+### mapper paraller end
+
+### reducer parallel begin
+parallel-reduce-comain: coordinator plugin_rtiming
+	./comain.exe ./../../assets/mapreduce/pg*.txt
+
+parallel-reduce-worker: worker plugin_rtiming
+	./worker.exe ./rtiming.so
+
+.ONESHELL:
+parallel-reduce-concurrent: coordinator worker plugin_rtiming
+	./parallel_reduce_concurrent.sh
+### reducer paraller end
+
+### jobcount begin
+jobcount-comain: coordinator plugin_jobcount
+	./comain.exe ./../../assets/mapreduce/pg*.txt
+
+jobcount-worker: worker plugin_jobcount
+	./worker.exe ./jobcount.so
+
+.ONESHELL:
+jobcount-concurrent: coordinator worker plugin_jobcount
+	./jobcountcon.sh
+### jobcount end
+
 clean:
-	rm ./*.so mr-*-*
+	rm ./*.so
+	rm ./mr-*-*
 	rm /var/tmp/824-mr-*
+	rm ./mr-worker-map-*
+	rm ./mr-worker-reduce-*
+	rm ./mr-worker-jobcount-*
 
 
 build: plugin sequential coordinator worker

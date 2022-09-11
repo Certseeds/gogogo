@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"sync"
@@ -180,25 +181,47 @@ func mapSchedule(status *map[int]workerStatus) {
 			todoFiles = append(todoFiles, FileName)
 		}
 	}
-	if len(todoFiles) > 0 {
-		for port, statu := range *status {
-			if len(statu.mapTask) == 0 && len(todoFiles) > 0 {
-				todoFile := todoFiles[0]
-				todoFiles = todoFiles[1:]
-				callWorker(port, "WorkWork.Mapper", MapRequest{
-					FileName:   todoFile,
-					MapOrder:   mapOrderNumber[todoFile],
-					ReduceNums: len(reduceTaskMap),
-				}, nil)
-				mapTaskMap[todoFile] = 1
-				(*status)[port] = workerStatus{
+	type pair struct {
+		key   int
+		value workerStatus
+	}
+	runnableWorker := make([]pair, 0)
+	for port, statu := range *status {
+		if len(statu.mapTask) == 0 && len(todoFiles) > 0 {
+			runnableWorker = append(runnableWorker, pair{port, statu})
+		}
+	}
+	minLength := int(math.Min(float64(len(todoFiles)), float64(len(runnableWorker))))
+	statusChan := make(chan pair, minLength)
+	for i := 0; i < minLength; i++ {
+		go func(todoFile string, port int, pairChan chan pair) {
+			callWorker(port, "WorkWork.Mapper", MapRequest{
+				FileName:   todoFile,
+				MapOrder:   mapOrderNumber[todoFile],
+				ReduceNums: len(reduceTaskMap),
+			}, nil)
+			pairChan <- pair{
+				key: port,
+				value: workerStatus{
 					enable:     true,
 					mapTask:    todoFile,
 					reduceTask: 0,
+				},
+			}
+		}(todoFiles[i], runnableWorker[i].key, statusChan)
+	}
+	func(length int, pairChan <-chan pair, status_ *map[int]workerStatus) {
+		for count := 0; count < length; {
+			select {
+			case p := <-pairChan:
+				{
+					mapTaskMap[p.value.mapTask] = 1
+					(*status_)[p.key] = p.value
+					count += 1
 				}
 			}
 		}
-	}
+	}(minLength, statusChan, status)
 }
 func reduceSchedule(status *map[int]workerStatus) {
 	todoTasks := make([]int, 0)
@@ -208,6 +231,7 @@ func reduceSchedule(status *map[int]workerStatus) {
 		}
 	}
 	if len(todoTasks) > 0 {
+		// TODO, use goroutine replace for cycle
 		for port, statu := range *status {
 			if statu.reduceTask == 0 && len(todoTasks) > 0 {
 				todoTask := todoTasks[0]

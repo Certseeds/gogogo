@@ -36,8 +36,6 @@ type AliveResponse struct {
 	TaskStartTime int64 // the unixstyle-timestamp for start the task
 }
 
-const BaseMagic = 100000007
-
 type MapRequest struct {
 	FileName   string
 	MapOrder   int // when input, add BasicMagic , reciver then minus it

@@ -42,11 +42,7 @@ func nparallel(phase string) int {
 		pat := fmt.Sprintf("mr-worker-%s-%%d", phase)
 		n, err := fmt.Sscanf(name, pat, &xpid)
 		if n == 1 && err == nil {
-			p, err := os.FindProcess(os.Getpid())
-			if err != nil {
-				panic(err)
-			}
-			err = p.Signal(syscall.SIGTERM) // CHANGE
+			err = syscall.Kill(xpid, 0)
 			if err == nil {
 				// if err == nil, xpid is alive.
 				ret += 1

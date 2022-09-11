@@ -28,6 +28,8 @@ var (
 
 func init() {
 	doingStatus.Store(kWorkerWaiting)
+	doingBeginTimestamp.Store(time.Now().UnixNano())
+	// 放这里的匿名go func(){}()也会被其他包引入
 }
 
 // KeyValue Map functions return a slice of KeyValue.
@@ -67,6 +69,7 @@ func (c *WorkWork) Mapper(request_ MapRequest, response *EmptyResponse) error {
 	go func(request MapRequest) {
 		log.Println(portGlobal, request.FileName, request.MapOrder, request.ReduceNums)
 		defer doingStatus.Store(kWorkerMapDone)
+		defer doingBeginTimestamp.Store(time.Now().UnixNano())
 		fileList := make([][]KeyValue, request.ReduceNums)
 		for i := 0; i < request.ReduceNums; i++ {
 			fileList[i] = make([]KeyValue, 0)
@@ -107,9 +110,11 @@ func readFileByLine(fileName string) []string {
 func (c *WorkWork) Reducer(request_ ReduceRequest, response *EmptyResponse) error {
 	fileList := request_.ReduceFileList
 	doingStatus.Store(kWorkerReduceDoing)
+	doingBeginTimestamp.Store(time.Now().UnixNano())
 	go func(request ReduceRequest) {
 		log.Println(portGlobal, request.ReduceOrder, request.ReduceFileList)
 		defer doingStatus.Store(kWorkerReduceDone)
+		defer doingBeginTimestamp.Store(time.Now().UnixNano())
 		allLines := make([]string, 0)
 		for _, filePath := range fileList {
 			lines := readFileByLine(filePath)
@@ -162,7 +167,15 @@ func Worker(mapf func(string, string) []KeyValue, reducef func(string, []string)
 	mapFunction = mapf
 	reduceFunction = reducef
 	// Your worker implementation here.
-
+	go func(staus *atomic.Int32, begin *atomic.Int64) {
+		for {
+			time.Sleep(time.Second)
+			diff := time.Now().UnixNano() - begin.Load()
+			if diff >= 10*time.Second.Nanoseconds() {
+				os.Exit(0)
+			}
+		}
+	}(&doingStatus, &doingBeginTimestamp)
 	// uncomment to send the MainExample RPC to the coordinator.
 	for count := 0; count < 3; count += 1 {
 		if Sign() {
