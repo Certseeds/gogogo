@@ -106,6 +106,7 @@ wc-compare:
 
 .ONESHELL:
 wc-concurrent: wc-sequen worker coordinator plugin_wc
+	chmod +x ./wccon.sh
 	./wccon.sh
 ### wc end
 
@@ -136,6 +137,7 @@ index-compare:
 
 .ONESHELL:
 index-concurrent: index-sequen worker coordinator plugin_indexer
+	chmod +x ./indexcon.sh
 	./indexcon.sh
 ### index end
 
@@ -148,6 +150,7 @@ parallel-map-worker: worker plugin_mtiming
 
 .ONESHELL:
 parallel-map-concurrent: coordinator worker plugin_mtiming
+	chmod +x ./parallel_map_concurrent.sh
 	./parallel_map_concurrent.sh
 ### mapper paraller end
 
@@ -160,6 +163,7 @@ parallel-reduce-worker: worker plugin_rtiming
 
 .ONESHELL:
 parallel-reduce-concurrent: coordinator worker plugin_rtiming
+	chmod +x ./parallel_reduce_concurrent.sh
 	./parallel_reduce_concurrent.sh
 ### reducer paraller end
 
@@ -172,6 +176,7 @@ jobcount-worker: worker plugin_jobcount
 
 .ONESHELL:
 jobcount-concurrent: coordinator worker plugin_jobcount
+	chmod +x ./jobcountcon.sh
 	./jobcountcon.sh
 ### jobcount end
 
@@ -184,6 +189,7 @@ earlyexit-worker: worker plugin_early_exit
 
 .ONESHELL:
 earlyexit-concurrent: coordinator worker plugin_early_exit
+	chmod +x ./early_exit_concurrent.sh
 	./early_exit_concurrent.sh
 ### early_exit end
 
@@ -204,6 +210,7 @@ crash-sequen: sequential plugin_nocrash
 
 .ONESHELL:
 crash-concurrent: coordinator worker plugin_crash crash-sequen
+	chmod +x ./crashcon.sh
 	./crashcon.sh
 ### crash end
 
@@ -222,4 +229,21 @@ clean:
 
 
 build: plugin sequential coordinator worker
-test: build wc-sequen index-sequen
+pretest: build wc-sequen index-sequen crash-sequen
+
+.ONESHELL:
+test: pretest
+	make clean || true
+	make wc-concurrent
+	make clean || true
+	make index-concurrent
+	make clean || true
+	make parallel-map-concurrent
+	make clean || true
+	make parallel-reduce-concurrent
+	make clean || true
+	make jobcount-concurrent
+	make clean || true
+	make earlyexit-concurrent
+	make clean || true
+	make crash-concurrent

@@ -20,9 +20,9 @@ jobs:
 
       - run: chmod +x ./Makefile
 
-      - run: pwd && make build
+      - run: make build
         env:
           SECRET_TOKEN: ${{ secrets.SECRET_TOKEN }}
           MYSQL_ROOT_PASSWORD: 123456
 
-      - run: pwd && make test
+      - run: make test
