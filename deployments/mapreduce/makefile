@@ -175,13 +175,50 @@ jobcount-concurrent: coordinator worker plugin_jobcount
 	./jobcountcon.sh
 ### jobcount end
 
+### early_exit begin
+earlyexit-comain: coordinator plugin_early_exit
+	./comain.exe ./../../assets/mapreduce/pg*.txt
+
+earlyexit-worker: worker plugin_early_exit
+	./worker.exe ./early_exit.so
+
+.ONESHELL:
+earlyexit-concurrent: coordinator worker plugin_early_exit
+	./early_exit_concurrent.sh
+### early_exit end
+
+### crash begin
+crash-comain: coordinator plugin_crash
+	./comain.exe ./../../assets/mapreduce/pg*.txt
+
+crash-worker: worker plugin_crash
+	./worker.exe ./early_exit.so
+
+.ONESHELL:
+crash-sequen: sequential plugin_nocrash
+	./sequential.exe \
+		./nocrash.so \
+		./../../assets/mapreduce/pg*.txt \
+	&& sort ./mr-out-0 > ./../../assets/mapreduce/mr-correct-crash.txt \
+	&& rm ./mr-out-0
+
+.ONESHELL:
+crash-concurrent: coordinator worker plugin_crash crash-sequen
+	./crashcon.sh
+### crash end
+
+
 clean:
 	rm ./*.so
+	rm ./*.exe
 	rm ./mr-*-*
 	rm /var/tmp/824-mr-*
 	rm ./mr-worker-map-*
 	rm ./mr-worker-reduce-*
 	rm ./mr-worker-jobcount-*
+	rm ./anydone*
+	rm ./mr-done
+
 
 
 build: plugin sequential coordinator worker

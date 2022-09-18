@@ -5,10 +5,10 @@ main() {
   ${TIMEOUT} ./comain.exe ./../../assets/mapreduce/pg*.txt &
   local pid=$!
   sleep 1
-  $TIMEOUT ./worker.exe ./jobcount.so &
-  $TIMEOUT ./worker.exe ./jobcount.so
-  $TIMEOUT ./worker.exe ./jobcount.so &
-  $TIMEOUT ./worker.exe ./jobcount.so
+  ${TIMEOUT} ./worker.exe ./jobcount.so &
+  ${TIMEOUT} ./worker.exe ./jobcount.so
+  ${TIMEOUT} ./worker.exe ./jobcount.so &
+  ${TIMEOUT} ./worker.exe ./jobcount.so
   wait ${pid}
   NT=$(cat mr-out* | awk '{print $2}')
   if [ "$NT" -eq "8" ]; then
